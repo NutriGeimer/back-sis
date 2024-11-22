@@ -23,7 +23,9 @@ app.use(rateLimitMiddleware);
 app.use(cors(corsOptions));
 
 // Sirve archivos estáticos desde la carpeta 'frontend'
-app.use(express.static(path.join(__dirname, '../frontend')));
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
+
+app.use(express.static(path.join(process.cwd(), 'frontend')));
 
 // Ruta principal para cargar la página de inicio (index.html)
 app.get('/', (req, res) => {
