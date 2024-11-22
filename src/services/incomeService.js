@@ -1,26 +1,42 @@
+import incomeRepo from '../logic/incomeRepo.js';
+import incomeModel from '../models/incomeModel.js';
+
+const IncomeRepo = new incomeRepo();
+
 class incomeService {
     async addIncome(amount) {
+        // Valida que el monto sea positivo
         if (!amount || amount <= 0) {
             throw new Error('Amount must be greater than 0');
         }
 
-        // Aquí se agregaría el ingreso al sistema, por ejemplo:
-        // Se podría almacenar en una base de datos o simplemente sumar al total de ingresos
-        const currentIncome = await this.getTotalIncome();
-        const newIncome = currentIncome + amount;
+        // Obtiene el total de ingresos actuales
+        const currentIncome = await IncomeRepo.getTotalIncome();
 
-        // Guardar el nuevo total de ingresos (esto es solo un ejemplo)
-        await this.updateIncome(newIncome);
+        // Calcula el nuevo total de ingresos
+        const newTotalIncome = currentIncome + amount;
+
+        // Registra el nuevo ingreso en la base de datos
+        await IncomeRepo.addIncome(newTotalIncome);
+        return newTotalIncome;
+    }
+
+    async updateIncome(id, amount) {
+        // Actualiza el ingreso si el ID y el monto son válidos
+        const income = await IncomeRepo.getIncomeById(id);
+        if (!income) throw new Error('Income not found');
+
+        const updatedIncome = income.totalIncome + amount;
+        await IncomeRepo.updateIncome(id, updatedIncome);
+        return updatedIncome;
+    }
+
+    async getIncomeById(id) {
+        return await IncomeRepo.getIncomeById(id);
     }
 
     async getTotalIncome() {
-        // Aquí se traería el total de ingresos desde la base de datos
-        return 1000;  // Solo un ejemplo, devuelve un valor ficticio
-    }
-
-    async updateIncome(totalIncome) {
-        // Guardar el total de ingresos en una base de datos o archivo
-        console.log('Total Income Updated:', totalIncome);
+        return await IncomeRepo.getTotalIncome();
     }
 }
 

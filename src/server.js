@@ -4,6 +4,7 @@ import errorHandlerMiddleware from './middleware/errorHandlerMiddleware.js';
 import rateLimitMiddleware from './middleware/rateLimitMiddleware.js';
 import routes from './routes/index.js';
 import cors from 'cors';
+import path from 'path';
 
 // Cargar variables de entorno
 dotenv.config();
@@ -21,7 +22,15 @@ app.use(express.json());
 app.use(rateLimitMiddleware);
 app.use(cors(corsOptions));
 
-// Rutas principales
+// Sirve archivos estáticos desde la carpeta 'frontend'
+app.use(express.static(path.join(__dirname, '../frontend')));
+
+// Ruta principal para cargar la página de inicio (index.html)
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend', 'index.html'));
+});
+
+// Rutas principales de la API
 app.use('/api/v1', routes);
 
 // Middleware de manejo de errores
