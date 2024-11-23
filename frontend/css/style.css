@@ -17,6 +17,11 @@ section {
 
 #refreskos-list .card {
     margin-bottom: 20px;
+    transition: transform 0.3s ease-in-out; /* Agregar transición para el hover */
+}
+
+#refreskos-list .card:hover {
+    transform: scale(1.05); /* Escala ligeramente la tarjeta al pasar el cursor */
 }
 
 .card-title {
@@ -29,14 +34,31 @@ section {
     border: none;
     padding: 8px 12px;
     cursor: pointer;
+    width: 100%; /* Asegura que el botón ocupe todo el ancho de la tarjeta */
 }
 
 .card-body button:hover {
     background-color: #218838;
 }
 
-#empleados-list li {
-    margin: 5px 0;
+#empleados-list {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#empleados-list th, #empleados-list td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+#empleados-list th {
+    background-color: #28a745;
+    color: white;
+}
+
+#empleados-list tr:hover {
+    background-color: #f1f1f1;
 }
 
 #empleados-list li, #ingresos-list li {
@@ -50,3 +72,11 @@ h3 {
     margin-top: 20px;
     color: #28a745;
 }
+
+#dashboard-img {
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    margin-top: 50px;
+}
+
