@@ -58,6 +58,10 @@ class salesService {
         // Obtener todas las ventas de un refresko específico
         return await SalesRepo.getSalesByRefresko(refreskoId);
     }
+
+    async getAllSales() {
+        return await SalesRepo.getAllSales();
+    }
 }
 
 export default salesService;

@@ -72,9 +72,25 @@ const getTotalIncome = async (req, res) => {
     }
 };
 
+const getAllIncomeRecords = async (req, res) => {
+    try {
+        const incomeRecords = await IncomeService.getAllIncomeRecords();
+        res.status(200).json({
+            success: true,
+            incomeRecords,
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+
 export {
     addIncome,
     updateIncome,
     getIncomeById,
     getTotalIncome,
+    getAllIncomeRecords
 };

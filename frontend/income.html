@@ -40,9 +40,17 @@
     <!-- Contenido principal -->
     <div id="content" class="container mt-5">
         <h2>Lista de Ingresos</h2>
-        <ul id="income-list" class="list-group">
-            <!-- Los ingresos se cargarán aquí dinámicamente -->
-        </ul>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Monto Total</th>
+                </tr>
+            </thead>
+            <tbody id="income-list">
+                <!-- Los ingresos se cargarán aquí dinámicamente -->
+            </tbody>
+        </table>
         <h3>Total de Ingresos: <span id="total-income">$0</span></h3>
     </div>
 

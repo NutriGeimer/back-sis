@@ -62,7 +62,6 @@ async function loadRefreskos() {
         const card = `
             <div class="col-md-4">
                 <div class="card">
-                    <img src="${refresko.imageUrl}" class="card-img-top" alt="${refresko.productname}">
                     <div class="card-body">
                         <h5 class="card-title">${refresko.productname}</h5>
                         <p class="card-text">${refresko.description}</p>
@@ -83,45 +82,48 @@ async function loadRefreskos() {
     document.getElementById('total-refreskos').innerText = data.refreskos.length;
 }
 
-// Agregar un nuevo refresko
-async function addRefresko() {
-    const productname = document.getElementById('refresko-name').value;
-    const description = document.getElementById('refresko-description').value;
-    const flavor = document.getElementById('refresko-flavor').value;
-    const small = document.getElementById('refresko-small').value;
-    const medium = document.getElementById('refresko-medium').value;
-    const large = document.getElementById('refresko-large').value;
-
-    const response = await fetch(`${API_URL}/refresko/add`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ productname, description, flavor, small, medium, large }),
-    });
-
-    const result = await response.json();
-    if (result.success) {
-        alert('Refresko agregado con éxito');
-        loadRefreskos();
-    } else {
-        alert('Hubo un error al agregar el refresko');
-    }
-}
-
-// Mostrar formulario para agregar refresko
-function showAddRefreskoForm() {
-    document.getElementById('add-refresko-form').style.display = 'block';
-}
-
 // Función para comprar refresko y generar ingreso
 async function comprarRefresko(refreskoId) {
+    const sizeOptions = ['small', 'medium', 'large'];
+    const selectedSize = prompt('¿Qué tamaño deseas comprar? (small, medium, large)').toLowerCase();
+
+    if (!sizeOptions.includes(selectedSize)) {
+        alert('Por favor, selecciona un tamaño válido: small, medium o large.');
+        return;
+    }
+
     const cantidad = prompt('¿Cuántos refreskos deseas comprar?');
-    if (!cantidad || isNaN(cantidad)) {
+    if (!cantidad || isNaN(cantidad) || cantidad <= 0) {
         alert('Por favor, ingresa una cantidad válida.');
         return;
     }
 
+    // Obtener detalles del refresko desde la API para calcular el precio
+    const refreskoResponse = await fetch(`${API_URL}/refresko/id/${refreskoId}`);
+    const refresko = await refreskoResponse.json();
+
+    let pricePerUnit;
+    switch (selectedSize) {
+        case 'small':
+            pricePerUnit = refresko.small;
+            break;
+        case 'medium':
+            pricePerUnit = refresko.medium;
+            break;
+        case 'large':
+            pricePerUnit = refresko.large;
+            break;
+    }
+
+    const totalPrice = pricePerUnit * cantidad;
+
+    // Verificar que los valores de la venta estén definidos correctamente
+    console.log('refreskoId:', refreskoId);
+    console.log('selectedSize:', selectedSize);
+    console.log('cantidad:', cantidad);
+    console.log('totalPrice:', totalPrice);
+
+    // Registrar la venta en la API
     const response = await fetch(`${API_URL}/sales/add`, {
         method: 'POST',
         headers: {
@@ -129,21 +131,22 @@ async function comprarRefresko(refreskoId) {
         },
         body: JSON.stringify({
             refreskoId: refreskoId,
-            size: 'mediano', // Aquí deberías agregar un selector de tamaño
-            quantity: cantidad,
-            totalPrice: 10 * cantidad, // Suponiendo un precio por refresco
+            size: selectedSize,
+            quantity: parseInt(cantidad),  // Asegurarnos de enviar la cantidad como número
+            totalPrice: totalPrice
         }),
     });
 
     const result = await response.json();
     if (result.success) {
-        alert('Compra realizada con éxito');
+        alert(`Compra realizada con éxito: ${cantidad} refresko(s) tamaño ${selectedSize} por $${totalPrice}.`);
         loadSales(); // Actualiza las ventas después de la compra
         loadIncome(); // Actualiza los ingresos después de la compra
     } else {
-        alert('Hubo un error al realizar la compra');
+        alert('Hubo un error al realizar la compra: ' + result.message);
     }
 }
+
 
 // Cargar las ventas desde la API
 async function loadSales() {
@@ -172,18 +175,27 @@ async function loadIncome() {
     const response = await fetch(`${API_URL}/income/all`);
     const data = await response.json();
     const incomeList = document.getElementById('income-list');
-    incomeList.innerHTML = '';
+    const totalIncomeElement = document.getElementById('total-income');
+    incomeList.innerHTML = '';  // Limpiar la lista de ingresos
 
     let totalIncome = 0;
 
-    data.incomes.forEach(income => {
-        const item = `<li class="list-group-item">$${income.totalIncome} - ${new Date(income.date).toLocaleString()}</li>`;
-        incomeList.innerHTML += item;
+    // Crear filas de la tabla para cada ingreso
+    data.incomeRecords.forEach(income => {
+        const row = `
+            <tr>
+                <td>${income.id}</td>
+                <td>$${income.totalIncome}</td>
+            </tr>
+        `;
+        incomeList.innerHTML += row;
         totalIncome += income.totalIncome;
     });
 
-    document.getElementById('total-income').innerText = `$${totalIncome}`;
+    // Actualizar el total de ingresos
+    totalIncomeElement.innerText = `$${totalIncome}`;
 }
+
 
 // Inicializar el contenido por defecto al cargar la página
 window.onload = function() {

@@ -40,6 +40,16 @@ class incomeRepo {
         });
         return totalIncome;
     }
+
+    async getAllIncomeRecords() {
+        const querySnapshot = await db.collection('income').get();
+        return querySnapshot.docs.map(doc => 
+            new incomeModel(
+                doc.id,
+                doc.data().totalIncome
+            )
+        );
+    }
 }
 
 export default incomeRepo;

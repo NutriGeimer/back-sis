@@ -48,6 +48,19 @@ class salesRepo {
             )
         );
     }
+
+    async getAllSales() {
+        const querySnapshot = await db.collection('sales').get();
+        return querySnapshot.docs.map(doc => 
+            new salesModel(
+                doc.id,
+                doc.data().refreskoId,
+                doc.data().size,
+                doc.data().quantity,
+                doc.data().totalPrice
+            )
+        );
+    }
 }
 
 export default salesRepo;

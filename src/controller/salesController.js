@@ -86,10 +86,26 @@ const getSalesByRefresko = async (req, res) => {
     }
 };
 
+const getAllSales = async (req, res) => {
+    try {
+        const sales = await SalesService.getAllSales();
+        res.status(200).json({
+            success: true,
+            sales,
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+
 export {
     addSale,
     updateSale,
     deleteSale,
     getSaleById,
     getSalesByRefresko,
+    getAllSales
 };

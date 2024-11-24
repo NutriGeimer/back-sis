@@ -38,6 +38,10 @@ class incomeService {
     async getTotalIncome() {
         return await IncomeRepo.getTotalIncome();
     }
+    
+    async getAllIncomeRecords() {
+        return await IncomeRepo.getAllIncomeRecords();
+    }
 }
 
 export default incomeService;
