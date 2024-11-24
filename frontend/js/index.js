@@ -62,6 +62,7 @@ async function loadRefreskos() {
         const card = `
             <div class="col-md-4">
                 <div class="card">
+                    <img src="${refresko.imageUrl}" class="card-img-top" alt="${refresko.productname}">
                     <div class="card-body">
                         <h5 class="card-title">${refresko.productname}</h5>
                         <p class="card-text">${refresko.description}</p>
@@ -82,6 +83,37 @@ async function loadRefreskos() {
     document.getElementById('total-refreskos').innerText = data.refreskos.length;
 }
 
+// Agregar un nuevo refresko
+async function addRefresko() {
+    const productname = document.getElementById('refresko-name').value;
+    const description = document.getElementById('refresko-description').value;
+    const flavor = document.getElementById('refresko-flavor').value;
+    const small = document.getElementById('refresko-small').value;
+    const medium = document.getElementById('refresko-medium').value;
+    const large = document.getElementById('refresko-large').value;
+
+    const response = await fetch(`${API_URL}/refresko/add`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ productname, description, flavor, small, medium, large }),
+    });
+
+    const result = await response.json();
+    if (result.success) {
+        alert('Refresko agregado con éxito');
+        loadRefreskos();
+    } else {
+        alert('Hubo un error al agregar el refresko');
+    }
+}
+
+// Mostrar formulario para agregar refresko
+function showAddRefreskoForm() {
+    document.getElementById('add-refresko-form').style.display = 'block';
+}
+
 // Función para comprar refresko y generar ingreso
 async function comprarRefresko(refreskoId) {
     const sizeOptions = ['small', 'medium', 'large'];
@@ -100,28 +132,27 @@ async function comprarRefresko(refreskoId) {
 
     // Obtener detalles del refresko desde la API para calcular el precio
     const refreskoResponse = await fetch(`${API_URL}/refresko/id/${refreskoId}`);
-    const refresko = await refreskoResponse.json();
+    const data = await refreskoResponse.json();
+    console.log('Detalles del refresko:', data);
 
     let pricePerUnit;
     switch (selectedSize) {
         case 'small':
-            pricePerUnit = refresko.small;
+            pricePerUnit = data.refresko.small;
             break;
         case 'medium':
-            pricePerUnit = refresko.medium;
+            pricePerUnit = data.refresko.medium;
             break;
         case 'large':
-            pricePerUnit = refresko.large;
+            pricePerUnit = data.refresko.large;
             break;
     }
 
-    const totalPrice = pricePerUnit * cantidad;
-
-    // Verificar que los valores de la venta estén definidos correctamente
-    console.log('refreskoId:', refreskoId);
-    console.log('selectedSize:', selectedSize);
-    console.log('cantidad:', cantidad);
-    console.log('totalPrice:', totalPrice);
+    const totalPrice = pricePerUnit * parseInt(cantidad);
+    console.log(`Precio total: $${totalPrice}`);
+    console.log('Tamaño seleccionado:', selectedSize);
+    console.log('Precio del tamaño seleccionado:', pricePerUnit);
+    console.log('Cantidad ingresada:', cantidad)
 
     // Registrar la venta en la API
     const response = await fetch(`${API_URL}/sales/add`, {
@@ -146,7 +177,6 @@ async function comprarRefresko(refreskoId) {
         alert('Hubo un error al realizar la compra: ' + result.message);
     }
 }
-
 
 // Cargar las ventas desde la API
 async function loadSales() {
@@ -181,7 +211,7 @@ async function loadIncome() {
     let totalIncome = 0;
 
     // Crear filas de la tabla para cada ingreso
-    data.incomeRecords.forEach(income => {
+    data.incomes.forEach(income => {
         const row = `
             <tr>
                 <td>${income.id}</td>
@@ -195,7 +225,6 @@ async function loadIncome() {
     // Actualizar el total de ingresos
     totalIncomeElement.innerText = `$${totalIncome}`;
 }
-
 
 // Inicializar el contenido por defecto al cargar la página
 window.onload = function() {
